@@ -38,7 +38,7 @@ public class MainUIController {
     private ClinicDepartmentRepository clinicDepartmentRepository;
 
 
-    @RequestMapping("/")
+    @RequestMapping(value = {"/", "/prices", "/feedback", "/contacts"})
     public ModelAndView welcome(ModelMap modelMap) {
         initSession(modelMap);
         modelMap.put("message", "Hello World");
@@ -272,8 +272,9 @@ public class MainUIController {
         model.addAttribute("appointmentDoctor", new Doctor());
         model.addAttribute("appointmentPatient", new Patient());
 
-        Integer doctorFromAppointmentClinicId = clinicService.getDoctorById(appointmentDoctorId).getClinicDepartment().getId();
-        return goToClinicDepartment(doctorFromAppointmentClinicId, model);
+        ModelAndView modelAndView = new ModelAndView("appointmentReport");
+        modelAndView.addObject("createdAppointment", appointment);
+        return modelAndView;
     }
 
     @RequestMapping(value = "/myAppointments", method = RequestMethod.GET)

@@ -37,17 +37,19 @@ public class ClinicService {
     private PatientRepository patientRepository;
     private AppointmentRepository appointmentRepository;
     private StreetRepository streetRepository;
+    private ClinicBuildService clinicBuildService;
 
     @Autowired
     public ClinicService(ClinicRepository clinicRepository, ClinicDepartmentRepository clinicDepartmentRepository,
                          DoctorRepository doctorRepository, PatientRepository patientRepository,
-                         AppointmentRepository appointmentRepository, StreetRepository streetRepository) {
+                         AppointmentRepository appointmentRepository, StreetRepository streetRepository, ClinicBuildService clinicBuildService) {
         this.clinicRepository = clinicRepository;
         this.clinicDepartmentRepository = clinicDepartmentRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.appointmentRepository = appointmentRepository;
         this.streetRepository = streetRepository;
+        this.clinicBuildService = clinicBuildService;
     }
 
     public Clinic createClinic() {
@@ -63,9 +65,7 @@ public class ClinicService {
         ClinicDepartment createdDepartment = clinicDepartmentRepository.save(clinicDepartment);
 
         for (String streetName : streets) {
-            Street street = new Street();
-            street.setName(streetName);
-            street.setDepartment(createdDepartment);
+            Street street = clinicBuildService.buildStreet(streetName, createdDepartment);
             streetRepository.save(street);
         }
         return clinicDepartmentRepository.getOne(createdDepartment.getId());
@@ -118,6 +118,33 @@ public class ClinicService {
         } else {
             return ((Patient) userByLogin).getAppointments();
         }
+    }
+
+    public String buildHtmlViewByAppointmentId(Integer appointmentId) {
+        Appointment appointment = appointmentRepository.getOne(appointmentId);
+        if (appointment == null) {
+            return "";
+        }
+        String surname = appointment.getDoctor() != null ? appointment.getDoctor().getSurname() : "";
+        String phoneNumber = appointment.getDoctor() != null ? appointment.getDoctor().getPhoneNumber() : "";
+        String clinicAddress = appointment.getDoctor() != null ? appointment.getDoctor().getClinicDepartment().getClinic().getAddress() : "";
+        return "<table border='1' bgcolor='lightgray'>\n" +
+                "<tr style='padding:3px;text-align:center;'>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + "Дата" + "</td>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + appointment.getAppointmentDate() + "</td></tr>\n" +
+                "<tr style='padding:3px;text-align:center;'>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + "Комментарий к приёму" + "</td>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + appointment.getCommentToAppointment() + "</td></tr>\n" +
+                "<tr style='padding:3px;text-align:center;'>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + "Фамилия врача" + "</td>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + surname + "</td></tr>\n" +
+                "<tr style='padding:3px;text-align:center;'>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + "Номер телефона врача" + "</td>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + phoneNumber + "</td></tr>\n" +
+                "<tr style='padding:3px;text-align:center;'>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + "Адрес клиники" + "</td>\n" +
+                "<td style=\"mso-number-format:\'\\@\'\">" + clinicAddress + "</td></tr>\n" +
+                "</table>";
     }
 
     public Map<String, Integer> getDateAsStrToAmountOfAppointmentsStats(Date startDate, Date endDate) {

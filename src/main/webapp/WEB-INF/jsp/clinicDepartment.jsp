@@ -162,34 +162,37 @@
 			</table>
 			<br/>
 			<br/>
-			<h4>Пациенты отделения</h4>
-			<table class="table-responsive table-no-bordered" id="patients_table" data-toggle="table"
-				   data-classes="table"
-				   data-click-to-select="true"
-				   data-url="/api/department/${clinicDepartment.id}/patients"
-				   data-side-pagination="client"
-				   data-pagination="true"
-				   data-page-size="10"
-				   data-page-list="[10, 25, 35, 45]"
-				   data-search="true"
-				   data-show-columns="true"
-				   data-show-refresh="true"
-				   data-show-toggle="true"
-				   data-show-multi-sort="true">
-				<thead>
-				<tr>
-					<th data-field="name" data-align="center" data-sortable="true">Имя</th>
-					<th data-field="surname" data-align="center" data-sortable="true">Фамилия</th>
-					<th data-field="phoneNumber" data-align="center" data-sortable="true">Номер телефона</th>
-					<th data-field="address" data-align="center" data-sortable="true">Адрес пациента</th>
-					<th data-field="birthDate" data-align="center" data-sortable="true" data-formatter="dateFormat">Дата Рождения</th>
-					<th data-field="id" data-formatter="PatientLinkFormatter" data-align="center"></th>
-					<th data-field="id" data-formatter="AddPatientToAppointmentForm" data-align="center"></th>
-				</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+			<c:if test="${currentUser.isAdmin()}">
+				<h4>Пациенты отделения</h4>
+				<table class="table-responsive table-no-bordered" id="patients_table" data-toggle="table"
+					   data-classes="table"
+					   data-click-to-select="true"
+					   data-url="/api/department/${clinicDepartment.id}/patients"
+					   data-side-pagination="client"
+					   data-pagination="true"
+					   data-page-size="10"
+					   data-page-list="[10, 25, 35, 45]"
+					   data-search="true"
+					   data-show-columns="true"
+					   data-show-refresh="true"
+					   data-show-toggle="true"
+					   data-show-multi-sort="true">
+					<thead>
+					<tr>
+						<th data-field="name" data-align="center" data-sortable="true">Имя</th>
+						<th data-field="surname" data-align="center" data-sortable="true">Фамилия</th>
+						<th data-field="phoneNumber" data-align="center" data-sortable="true">Номер телефона</th>
+						<th data-field="address" data-align="center" data-sortable="true">Адрес пациента</th>
+						<th data-field="birthDate" data-align="center" data-sortable="true" data-formatter="dateFormat">Дата Рождения</th>
+						<th data-field="id" data-formatter="PatientLinkFormatter" data-align="center"></th>
+						<th data-field="id" data-formatter="AddPatientToAppointmentForm" data-align="center"></th>
+					</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</c:if>
+
 		</div>
 		<div class="col-md-2 col-lg-2" id="rightBarContainer">
 			<c:if test="${currentUser.isAdmin()}">
@@ -206,11 +209,20 @@
                 <input class="form-control" name="appointmentDoctorSurname" id="appointmentDoctorSurname" type="text" required="required" value="${appointmentDoctor.surname}" readonly pattern=".{1,}"/>
                 <input type="hidden" name="appointmentDoctorId" id="appointmentDoctorId" value="${appointmentDoctor.id}">
 
-                <label class="control-label" for="appointmentPatientSurname">
-                    Пациент для приёма
-                </label>
-                <input class="form-control" name="appointmentPatientSurname" id="appointmentPatientSurname" type="text" required="required" value="${appointmentPatient.surname}" readonly pattern=".{1,}"/>
-                <input type="hidden" name="appointmentPatientId" id="appointmentPatientId" value="${appointmentPatient.id}">
+				<c:if test="${currentUser.isAdmin()}">
+					<label class="control-label" for="appointmentPatientSurname">
+						Пациент для приёма
+					</label>
+					<input class="form-control" name="appointmentPatientSurname" id="appointmentPatientSurname" type="text" required="required" value="${appointmentPatient.surname}" readonly pattern=".{1,}"/>
+					<input type="hidden" name="appointmentPatientId" id="appointmentPatientId" value="${appointmentPatient.id}">
+				</c:if>
+				<c:if test="${not currentUser.isAdmin()}">
+					<label class="control-label" for="appointmentPatientSurname">
+						Пациент для приёма
+					</label>
+					<input class="form-control" name="appointmentPatientSurname" id="appointmentPatientSurname" type="text" required="required" value="${currentUser.surname}" readonly pattern=".{1,}"/>
+					<input type="hidden" name="appointmentPatientId" id="appointmentPatientId" value="${currentUser.id}">
+				</c:if>
 
                 <label class="control-label" for="appointmentDate">
                     Дата приёма

@@ -10,12 +10,17 @@ import com.bsuir.clinic.website.repository.ClinicDepartmentRepository;
 import com.bsuir.clinic.website.service.ClinicService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +72,14 @@ public class MainRestController {
     }
 
 
-
-
+    @RequestMapping(value = "/downloadAppointmentInfo/{appointmentId}", method = RequestMethod.GET)
+    public ResponseEntity<InputStreamResource> downloadAppointmentInfo(@PathVariable Integer appointmentId) throws IOException {
+        String htmlView = clinicService.buildHtmlViewByAppointmentId(appointmentId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=myAppointment.xls");
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(new ByteArrayInputStream(htmlView.getBytes())));
+    }
 }

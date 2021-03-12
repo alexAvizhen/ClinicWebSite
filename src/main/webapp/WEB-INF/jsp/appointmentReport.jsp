@@ -7,7 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta firstName="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-	<title>Отделения</title>
+	<title>Приём</title>
 
 	<spring:url var="home" value="/" scope="request"/>
 
@@ -25,22 +25,12 @@
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
 	<script src="/resources/js/lib/bootstrap.js"></script>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/resources/js/lib/bootstrap.js"></script>
+	<spring:url value="/resources/js/lib/jquery.1.10.2.min.js"
+				var="jqueryJs"/>
+	<script src="${jqueryJs}"></script>
 
-
-
-    <%--bootstrap-tables--%>
-    <link rel="stylesheet" href="/resources/css/bootstrap-table.css"/>
-    <script src="/resources/js/lib/bootstrap-table.js"></script>
-    <script src="/resources/js/lib/lodash.min.js"></script>
-    <script src="/resources/js/lib/bootstrap-table-filter-control.min.js"></script>
-    <script src="/resources/js/lib/bootstrap-table-multiple-sort.js"></script>
-
-    <%--To overload bootstrap config--%>
-    <link href="${coreCss}" rel="stylesheet"/>
+	<spring:url value="/resources/js/lib/jquery.i18n.properties-min-1.0.9.js" var="jqueryi18n"/>
+	<script src="${jqueryi18n}"></script>
 
 
 	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -111,48 +101,46 @@
 
 <div class="container">
 	<div class="row">
-		<h3>Отделения клинки</h3>
+		<h3>Приём зафиксирован</h3>
 	</div>
 </div>
 
 <div class="container">
+	<h3>
+		${param.msg}
+	</h3>
+	<div class="row">
+		<div class="col-md-8 col-lg-9" id="contentContainer">
+			<p>Ваш приём зафиксирован в системе</p>
+			Информация о приёме:<br>
+			<table border="1">
+				<tr>
+					<td>Дата:</td>
+					<td>${createdAppointment.appointmentDate}</td>
+				</tr>
+				<tr>
+					<td>Комментарий к приёму:</td>
+					<td>${createdAppointment.commentToAppointment}</td>
+				</tr>
+				<tr>
+					<td>Фамилия врача:</td>
+					<td>${createdAppointment.doctor.surname}</td>
+				</tr>
+				<tr>
+					<td>Номер телефона врача:</td>
+					<td>${createdAppointment.doctor.phoneNumber}</td>
+				</tr>
+				<tr>
+					<td>Адрес клиники:</td>
+					<td>${createdAppointment.doctor.clinicDepartment.clinic.address}</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-md-4 col-lg-3" id="rightBarContainer">
+			<a href="/api/downloadAppointmentInfo/${createdAppointment.id}">Скачать информацию о приёме</a>
 
-    <c:if test="${currentUser.id == 0}">
-        <h3>Пожалуйста, войдите в систему, чтобы увидеть отделения клиники</h3>
-    </c:if>
-    <c:if test="${currentUser.id != 0}">
-        <div class="row">
-            <div class="col-md-12 col-lg-12" id="contentContainer">
-
-                <table class="table-responsive table-no-bordered" id="catalog_table" data-toggle="table"
-                       data-classes="table"
-                       data-click-to-select="true"
-                       data-url="/api/departments"
-                       data-side-pagination="client"
-                       data-pagination="true"
-                       data-page-size="10"
-                       data-page-list="[10, 25, 35, 45]"
-                       data-search="true"
-                       data-show-columns="true"
-                       data-show-refresh="true"
-                       data-show-toggle="true"
-                       data-show-multi-sort="true">
-                    <thead>
-                    <tr>
-                        <th data-field="name" data-align="center" data-sortable="true">Название</th>
-                        <th data-field="streetNames" data-align="center" data-sortable="true">Улицы</th>
-                        <th data-field="patients.length" data-align="center" data-sortable="true">Количество пациентов</th>
-                        <th data-field="doctors.length" data-align="center" data-sortable="true">Количество докторов</th>
-                        <th data-field="id" data-formatter="LinkFormatter" data-align="center"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
-    </c:if>
+		</div>
+	</div>
 </div>
 
 <div class="container" id="footer">
@@ -165,10 +153,6 @@
 	</div>
 	<hr />
 </div>
-<script>
-	function LinkFormatter(value, row, index) {
-		return "<a href=\"/clinicDepartment/" + value + "\">Подробнее</a>";
-	}
-</script>
+
 </body>
 </html>
